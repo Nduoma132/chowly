@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id            String   @id @default(cuid())
+  name          String
+  address       String
+  contactNumber String
+  menuItems     MenuItem[]
+  waiters       Waiter[]
+  chefs         Chef[]
+  bartenders    Bartender[]
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  name        String
+  phoneNumber String
+  email       String   @unique
+  orders      Order[]
+}
+
+model MenuItem {
+  id             String      @id @default(cuid())
+  restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId   String
+  name           String
+  type           String      // "Food" or "Drink"
+  price          Float
+  orderItems     OrderItem[]
+}
+
+model Waiter {
+  id           String   @id @default(cuid())
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  name         String
+  orders       Order[]
+}
+
+model Chef {
+  id           String   @id @default(cuid())
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  name         String
+  specialty    String
+  orderItems   OrderItem[]
+}
+
+model Bartender {
+  id           String   @id @default(cuid())
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  name         String
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customer      Customer    @relation(fields: [customerId], references: [id])
+  customerId    String
+  waiter        Waiter      @relation(fields: [waiterId], references: [id])
+  waiterId      String
+  orderTime     DateTime    @default(now())
+  waitingTime   Int?        // minutes
+  status        String      @default("Pending") // Pending, Preparing, Served, Completed
+  items         OrderItem[]
+  payment       Payment?
+  complaint     Complaint?
+}
+
+model OrderItem {
+  id             String     @id @default(cuid())
+  order          Order      @relation(fields: [orderId], references: [id])
+  orderId        String
+  menuItem       MenuItem   @relation(fields: [menuItemId], references: [id])
+  menuItemId     String
+  quantity       Int
+  chef           Chef?      @relation(fields: [chefId], references: [id])
+  chefId         String?
+  bartender      Bartender? @relation(fields: [bartenderId], references: [id])
+  bartenderId    String?
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderId       String   @unique
+  amount        Float
+  method        String   // Card, Cash, Transfer, Wallet
+  status        String   @default("Pending") // Pending, Completed
+  paymentTime   DateTime @default(now())
+}
+
+model Complaint {
+  id             String   @id @default(cuid())
+  order          Order    @relation(fields: [orderId], references: [id])
+  orderId        String   @unique
+  description    String
+  rating         Int      // 1 to 5
+  complaintTime  DateTime @default(now())
+}
