@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { api } from "../api";
 
 interface MenuItem {
@@ -7,6 +7,13 @@ interface MenuItem {
   name: string;
   type: string;
   price: number;
+  preparationTime?: number;
+}
+
+interface CreatedOrder {
+  id: string;
+  waitingTime: number | null;
+  status: string;
 }
 
 interface Restaurant {
@@ -23,7 +30,6 @@ interface Waiter {
 function Order() {
   const { restaurantId } = useParams();
   const [params] = useSearchParams();
-  const navigate = useNavigate();
 
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [waiters, setWaiters] = useState<Waiter[]>([]);
@@ -35,6 +41,7 @@ function Order() {
   const [restName, setRestName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [placed, setPlaced] = useState<CreatedOrder | null>(null);
 
   // load restaurant + menu + waiters
   useEffect(() => {
@@ -105,7 +112,8 @@ function Order() {
         items: selectedItems.map((m) => ({ menuItemId: m.id, quantity: cart[m.id] })),
       });
 
-      navigate(`/pay/${order.id}`);
+      // show a confirmation with the order details and waiting time
+      setPlaced(order);
     } catch (e: any) {
       setError(e.message || "Could not place the order.");
       setSubmitting(false);
@@ -114,6 +122,45 @@ function Order() {
 
   return (
     <div>
+      {placed && (
+        <div className="card" style={{ marginBottom: 20, borderLeft: "4px solid #e8590c" }}>
+          <h2 style={{ marginTop: 0 }}>✅ Order placed!</h2>
+          <p>
+            <strong>Order #:</strong> {placed.id.slice(-6).toUpperCase()}
+          </p>
+          <p>
+            <strong>Status:</strong> <span className="badge">{placed.status}</span>
+          </p>
+          <p>
+            <strong>Estimated waiting time:</strong>{" "}
+            <span style={{ color: "#e8590c", fontWeight: 700 }}>
+              {placed.waitingTime ?? 0} minutes
+            </span>
+          </p>
+          <h3>Your items</h3>
+          {selectedItems.map((m) => (
+            <div className="row" key={m.id}>
+              <span>{m.name} × {cart[m.id]}</span>
+              <span>₦{m.price * cart[m.id]}</span>
+            </div>
+          ))}
+          <div className="row">
+            <strong>Total</strong>
+            <strong>₦{total}</strong>
+          </div>
+          <p style={{ marginTop: 12 }}>
+            <Link to={`/pay/${placed.id}`} className="btn">
+              Proceed to payment
+            </Link>{" "}
+            <Link to={`/track/${placed.id}`} className="btn secondary">
+              Track order
+            </Link>
+          </p>
+        </div>
+      )}
+
+      {!placed && (
+        <>
       <h1>Place your order at {restName}</h1>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
@@ -123,7 +170,7 @@ function Order() {
           <div>
             <strong>{m.name}</strong>
             <span style={{ marginLeft: 8, color: "#777" }}>
-              {m.type} · ₦{m.price}
+              {m.type} · ₦{m.price} · ⏱ {m.preparationTime ?? 0} min
             </span>
           </div>
           <div>
@@ -167,6 +214,8 @@ function Order() {
       <button className="btn" onClick={placeOrder} disabled={submitting}>
         {submitting ? "Placing…" : "Place order"}
       </button>
+        </>
+      )}
     </div>
   );
 }

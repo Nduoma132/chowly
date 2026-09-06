@@ -13,20 +13,27 @@ router.get("/", async (_req, res) => {
 
 // create a menu item for a restaurant
 router.post("/", async (req, res) => {
-  const { restaurantId, name, type, price } = req.body; // type: Food/Drink
+  const { restaurantId, name, type, price, preparationTime } = req.body; // type: Food/Drink
   const item = await prisma.menuItem.create({
-    data: { restaurantId, name, type, price: Number(price) },
+    data: {
+      restaurantId,
+      name,
+      type,
+      price: Number(price),
+      preparationTime: preparationTime !== undefined ? Number(preparationTime) : 0,
+    },
   });
   res.status(201).json(item);
 });
 
 // update a menu item (price / availability)
 router.patch("/:id", async (req, res) => {
-  const { price, name, type } = req.body;
-  const data: { price?: number; name?: string; type?: string } = {};
+  const { price, name, type, preparationTime } = req.body;
+  const data: { price?: number; name?: string; type?: string; preparationTime?: number } = {};
   if (price !== undefined) data.price = Number(price);
   if (name !== undefined) data.name = name;
   if (type !== undefined) data.type = type;
+  if (preparationTime !== undefined) data.preparationTime = Number(preparationTime);
   const item = await prisma.menuItem.update({
     where: { id: req.params.id },
     data,

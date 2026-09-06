@@ -48,6 +48,9 @@ function Pay() {
       <div>
         <h1>✅ Payment successful</h1>
         <p>Your payment of ₦{total} was completed via {method}.</p>
+        <p style={{ color: "#888", fontSize: 14 }}>
+          ⚠️ Pretend payment — no real money was charged.
+        </p>
         <Link className="btn" to={`/track/${orderId}`}>Track your order</Link>
       </div>
     );
@@ -56,6 +59,9 @@ function Pay() {
   return (
     <div>
       <h1>Checkout</h1>
+      <p style={{ color: "#888", fontSize: 14 }}>
+        ⚠️ This is a <strong>pretend payment</strong> for the demo — no real money is charged.
+      </p>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
       <h2>Order summary</h2>

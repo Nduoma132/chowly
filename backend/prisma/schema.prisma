@@ -27,13 +27,14 @@ model Customer {
 }
 
 model MenuItem {
-  id             String      @id @default(cuid())
-  restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
-  restaurantId   String
-  name           String
-  type           String      // "Food" or "Drink"
-  price          Float
-  orderItems     OrderItem[]
+  id               String      @id @default(cuid())
+  restaurant       Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId     String
+  name             String
+  type             String      // "Food" or "Drink"
+  price            Float
+  preparationTime  Int         // minutes to prepare this item
+  orderItems       OrderItem[]
 }
 
 model Waiter {

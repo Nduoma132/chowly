@@ -48,21 +48,21 @@ async function main() {
     data: { name: "Grace Eze", phoneNumber: "08133444555", email: "grace.eze@email.com" },
   });
 
-  // Menu items
+  // Menu items (name, price, preparation time in minutes)
   const chicken = await prisma.menuItem.create({
-    data: { restaurantId: grill.id, name: "Grilled Chicken", type: "Food", price: 4500 },
+    data: { restaurantId: grill.id, name: "Grilled Chicken", type: "Food", price: 4500, preparationTime: 20 },
   });
   const chapman = await prisma.menuItem.create({
-    data: { restaurantId: grill.id, name: "Chapman", type: "Drink", price: 1500 },
+    data: { restaurantId: grill.id, name: "Chapman", type: "Drink", price: 1500, preparationTime: 5 },
   });
   const pasta = await prisma.menuItem.create({
-    data: { restaurantId: ocean.id, name: "Cheese Pasta", type: "Food", price: 6000 },
+    data: { restaurantId: ocean.id, name: "Cheese Pasta", type: "Food", price: 6000, preparationTime: 15 },
   });
   await prisma.menuItem.create({
-    data: { restaurantId: spice.id, name: "Jollof Rice", type: "Food", price: 3500 },
+    data: { restaurantId: spice.id, name: "Jollof Rice", type: "Food", price: 3500, preparationTime: 15 },
   });
   await prisma.menuItem.create({
-    data: { restaurantId: spice.id, name: "Zobo", type: "Drink", price: 500 },
+    data: { restaurantId: spice.id, name: "Zobo", type: "Drink", price: 500, preparationTime: 3 },
   });
 
   // Waiters
@@ -77,7 +77,7 @@ async function main() {
   });
 
   // Chefs
-  await prisma.chef.create({
+  const chefEmeka = await prisma.chef.create({
     data: { restaurantId: grill.id, name: "Emeka Nwosu", specialty: "Grills & BBQ" },
   });
   await prisma.chef.create({
@@ -88,7 +88,7 @@ async function main() {
   });
 
   // Bartenders
-  await prisma.bartender.create({
+  const bartenderChidi = await prisma.bartender.create({
     data: { restaurantId: grill.id, name: "Chidi Umeh" },
   });
   await prisma.bartender.create({
@@ -99,16 +99,17 @@ async function main() {
   });
 
   // An example order + payment + complaint (Order O001, customer Ada, waiter John)
+  // The waiter has assigned chefEmeka to the food item and bartenderChidi to the drink item.
   const order = await prisma.order.create({
     data: {
       customerId: ada.id,
       waiterId: john.id,
-      status: "Completed",
-      waitingTime: 15,
+      status: "Served",
+      waitingTime: 25,
       items: {
         create: [
-          { menuItemId: chicken.id, quantity: 2 },
-          { menuItemId: chapman.id, quantity: 1 },
+          { menuItemId: chicken.id, quantity: 2, chefId: chefEmeka.id },
+          { menuItemId: chapman.id, quantity: 1, bartenderId: bartenderChidi.id },
         ],
       },
     },

@@ -1,40 +1,61 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import RestaurantMenu from "./pages/RestaurantMenu";
 import Order from "./pages/Order";
 import Pay from "./pages/Pay";
 import Track from "./pages/Track";
-import WaiterDash from "./pages/WaiterDash";
-import ChefDash from "./pages/ChefDash";
-import BartenderDash from "./pages/BartenderDash";
 import Admin from "./pages/Admin";
+import WaiterHome from "./pages/WaiterHome";
 import "./App.css";
 
 function App() {
+  const [role, setRole] = useState<"customer" | "waiter">("customer");
+
   return (
     <BrowserRouter>
       <header className="nav">
         <Link to="/" className="brand">🍔 Chowly</Link>
         <nav>
-          <Link to="/">Restaurants</Link>
-          <Link to="/waiter">Waiter</Link>
-          <Link to="/chef">Chef</Link>
-          <Link to="/bartender">Bartender</Link>
+          {/* simple role switch — no login required */}
+          <span className="role-switch">
+            <button
+              className={role === "customer" ? "role-btn active" : "role-btn"}
+              onClick={() => setRole("customer")}
+            >
+              Customer
+            </button>
+            <button
+              className={role === "waiter" ? "role-btn active" : "role-btn"}
+              onClick={() => setRole("waiter")}
+            >
+              Waiter
+            </button>
+          </span>
+          {role === "waiter" && (
+            <Link to="/waiter">Waiter dashboard</Link>
+          )}
           <Link to="/admin">Admin</Link>
         </nav>
       </header>
       <main className="page">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/restaurants/:id" element={<RestaurantMenu />} />
-          <Route path="/order/:restaurantId" element={<Order />} />
-          <Route path="/pay/:orderId" element={<Pay />} />
-          <Route path="/track/:orderId" element={<Track />} />
-          <Route path="/waiter" element={<WaiterDash />} />
-          <Route path="/chef" element={<ChefDash />} />
-          <Route path="/bartender" element={<BartenderDash />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
+        {role === "waiter" ? (
+          <Routes>
+            <Route path="/waiter" element={<WaiterHome />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<Navigate to="/waiter" replace />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/restaurants/:id" element={<RestaurantMenu />} />
+            <Route path="/order/:restaurantId" element={<Order />} />
+            <Route path="/pay/:orderId" element={<Pay />} />
+            <Route path="/track/:orderId" element={<Track />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        )}
       </main>
     </BrowserRouter>
   );

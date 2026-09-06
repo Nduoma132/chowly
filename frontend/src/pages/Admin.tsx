@@ -28,6 +28,7 @@ function Admin() {
   const [mName, setMName] = useState("");
   const [mType, setMType] = useState("Food");
   const [mPrice, setMPrice] = useState("");
+  const [mPrep, setMPrep] = useState("");
 
   // waiter form
   const [wRestId, setWRestId] = useState("");
@@ -55,9 +56,10 @@ function Admin() {
       name: mName,
       type: mType,
       price: Number(mPrice),
+      preparationTime: mPrep ? Number(mPrep) : 0,
     });
     setMsg("Menu item added ✅");
-    setMName(""); setMPrice("");
+    setMName(""); setMPrice(""); setMPrep("");
     load();
   };
 
@@ -100,6 +102,8 @@ function Admin() {
       </select>
       <label>Price (₦)</label>
       <input value={mPrice} onChange={(e) => setMPrice(e.target.value)} type="number" />
+      <label>Preparation time (minutes)</label>
+      <input value={mPrep} onChange={(e) => setMPrep(e.target.value)} type="number" />
       <div style={{ marginTop: 10 }}>
         <button className="btn" onClick={addMenuItem}>Add menu item</button>
       </div>

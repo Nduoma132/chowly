@@ -7,6 +7,7 @@ interface MenuItem {
   name: string;
   type: string; // Food or Drink
   price: number;
+  preparationTime?: number;
 }
 
 interface Restaurant {
@@ -40,7 +41,9 @@ function RestaurantMenu() {
         <div className="row" key={m.id}>
           <div>
             <strong>{m.name}</strong>
-            <span style={{ marginLeft: 8, color: "#777" }}>₦{m.price}</span>
+            <span style={{ marginLeft: 8, color: "#777" }}>
+              ₦{m.price} · ⏱ {m.preparationTime ?? 0} min
+            </span>
           </div>
           <Link className="btn secondary" to={`/order/${rest.id}?item=${m.id}`}>
             Add to order
