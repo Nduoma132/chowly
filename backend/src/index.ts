@@ -29,5 +29,5 @@ app.use("/api/bartenders", bartendersRouter);
 app.use("/api/payments", paymentsRouter);
 app.use("/api/complaints", complaintsRouter);
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
