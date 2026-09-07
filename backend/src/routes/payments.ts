@@ -37,7 +37,13 @@ router.post("/", async (req, res) => {
     },
   });
 
-  res.status(201).json(payment);
+  // Requirement: payment "marks the order as paid" — flip the order to Completed.
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { status: "Completed" },
+  });
+
+  res.status(201).json({ payment, orderStatus: "Completed" });
 });
 
 export default router;
